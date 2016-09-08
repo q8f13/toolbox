@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using qbfox;
 
 public class fsmTest : MonoBehaviour
 {
