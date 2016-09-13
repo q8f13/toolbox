@@ -43,6 +43,8 @@ namespace qbfox
 		private Vector3 _bleedout_bl;
 		private Vector3 _bleedout_br;
 
+		private Vector3 _targetLastPosition;
+
 		void Start()
 		{
 			_cam = GetComponent<Camera>();
@@ -109,6 +111,8 @@ namespace qbfox
 			// lock住深度偏移量
 			pos.z = Target.position.z - _offsetZ;
 
+			_targetLastPosition = Target.position;
+
 			transform.position = pos;
 		}
 
@@ -172,7 +176,12 @@ namespace qbfox
 		// 判断水平方向出界
 		bool IsOutOfBoundHorizon()
 		{
-			if (_targetInViewportPoint.x < 0.5f - Left || _targetInViewportPoint.x > 0.5f + Right)
+			if (_targetInViewportPoint.x < 0.5f - Left
+			    && Target.position.x < _targetLastPosition.x)
+				return true;
+
+			if ( _targetInViewportPoint.x > 0.5f + Right
+			    && Target.position.x > _targetLastPosition.x)
 				return true;
 
 			return false;
