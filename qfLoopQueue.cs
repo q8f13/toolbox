@@ -3,6 +3,7 @@ using Object = UnityEngine.Object;
 
 /// <summary>
 /// 可遍历的循环队列
+/// from: http://www.cs.bu.edu/teaching/c/queue/array/types.html
 /// </summary>
 /// <typeparam name="T"></typeparam>
 
