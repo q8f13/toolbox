@@ -30,6 +30,7 @@ namespace qbfox
 			if (IsFull())
 				throw new Exception("queue is full");
 			_array[_rear++] = value;
+			_rear = _rear >= _count ? 0 : _rear;
 		}
 
 		public T Dequeue()
@@ -38,6 +39,7 @@ namespace qbfox
 				throw new Exception("queue is empty");
 			T result = _array[_front];
 			_array[_front--] = default(T);
+			_front = _front < 0 ? _count - 1 : _front;
 			return result;
 		}
 
@@ -49,7 +51,7 @@ namespace qbfox
 			int idx = _front + index;
 			if (idx > _count - 1)
 				idx -= _count; 
-			return _array[_front + idx];
+			return _array[idx];
 		}
 
 		public bool IsFull()
@@ -61,6 +63,13 @@ namespace qbfox
 				return true;
 
 			return false;
+		}
+
+		public void Clear()
+		{
+			_front = 0;
+			_rear = 0;
+			_array = new T[_count];
 		}
 
 		public int ElementCount()
