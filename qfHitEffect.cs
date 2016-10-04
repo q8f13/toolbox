@@ -17,9 +17,9 @@ public class qfHitEffect : MonoBehaviour
 
 	private Vector3 _size;
 
-	public void OnHit(Collider2D col)
+	public void OnHit(Collider2D col, Vector3 pos)
 	{
-		transform.position = col.bounds.center;
+		transform.position = pos;
 		_size = col.bounds.size;
 		_animator.Play(ON_HIT_KEY, 0, 0f);
 
@@ -37,7 +37,7 @@ public class qfHitEffect : MonoBehaviour
 		if (!DebugOn)
 			return;
 
-		if (_animator.GetCurrentAnimatorStateInfo(0).IsName(ON_HIT_KEY))
+		if (_animator != null && _animator.GetCurrentAnimatorStateInfo(0).IsName(ON_HIT_KEY))
 		{
 			Gizmos.color = Color.red;
 			Gizmos.DrawWireCube(transform.position, _size);
