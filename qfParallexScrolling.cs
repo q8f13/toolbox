@@ -10,6 +10,7 @@ namespace qbfox
 	[ExecuteInEditMode]
 	public class qfParallexScrolling : MonoBehaviour
 	{
+		public float Multiply = 1.0f;
 		public ScrollingBackground[] Backgrounds;		// 所需滚动的背景
 		public Camera TargetCamera;						// 基于这个相机的移动来做卷屏
 
@@ -29,6 +30,7 @@ namespace qbfox
 		{
 			IsExecuting = true;
 			_viewportToCameraOffset = transform.position - TargetCamera.transform.position;
+			_viewportToCameraOffset.z = 0;
 
 		}
 
@@ -49,9 +51,10 @@ namespace qbfox
 			if (!IsExecuting || _camLastPos == Vector3.zero)
 				return;
 
-			Vector3 camPos = TargetCamera.transform.position;
+			Vector3 camPos_xy = TargetCamera.transform.position;
+			camPos_xy.z = 0;
 
-			Vector2 cam_delta_offset = new Vector2(_camLastPos.x - camPos.x, _camLastPos.y - camPos.y);
+			Vector2 cam_delta_offset = new Vector2(_camLastPos.x - camPos_xy.x, _camLastPos.y - camPos_xy.y);
 
 			if (cam_delta_offset == Vector2.zero)
 				return;
@@ -63,13 +66,14 @@ namespace qbfox
 			_horizionOffsetToScreen = cam_delta_offset.x/Screen.width;
 
 			// 相机保持相对位置
-			transform.position = camPos + _viewportToCameraOffset;
+			Vector3 nextPos = camPos_xy + _viewportToCameraOffset;
+			transform.position = new Vector3(nextPos.x, nextPos.y, transform.position.z); 
 
 			ScrollingBackground currBg = null;
 			for (int i = 0; i < Backgrounds.Length; i++)
 			{
 				currBg = Backgrounds[i];
-				float uvSpeed = _horizionOffsetToScreen * currBg.SpeedRate;
+				float uvSpeed = _horizionOffsetToScreen * currBg.SpeedRate * Multiply;
 				Material mat = currBg.Container.GetComponent<MeshRenderer>().sharedMaterial;
 				if (currBg.IsUVLooping
 				 && BondAssetOutOfViewport(currBg.Container, currBg.AssetBond))
@@ -143,7 +147,7 @@ namespace qbfox
 			for (int i = 0; i < Backgrounds.Length; i++)
 			{
 				Vector3 pos = Backgrounds[i].Container.localPosition;
-				pos.z = i*Z_Offset;
+				pos.z = (i + 1)*Z_Offset*(Backgrounds[i].IsCover ? -1 : 1);
 				Backgrounds[i].Container.localPosition = pos;
 			}
 		}
@@ -181,6 +185,7 @@ namespace qbfox
 		public Transform AssetBond;
 
 		public bool IsUVLooping = false;
+		public bool IsCover = false;		// 能覆盖场景大多数内容的前景素材
 
 	}
 }
