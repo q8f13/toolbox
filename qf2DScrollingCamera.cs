@@ -17,6 +17,8 @@ namespace qbfox
 		public float Left = 0.3f;
 		public float Right = 0.3f;
 
+		public bool HorizontalOnly = false;
+
 		// scrolling style
 		public ScrollingType Policy = ScrollingType.Starring;
 
@@ -45,6 +47,8 @@ namespace qbfox
 
 		private Vector3 _targetLastPosition;
 
+		private float _offsetXInLerping = -1f;
+
 		void Start()
 		{
 			_cam = GetComponent<Camera>();
@@ -63,20 +67,67 @@ namespace qbfox
 			if (Target == null)
 				return;
 
+
+			// 根据目标在世界空间投射到屏幕后的位置来决定是否需要卷屏
+			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position);
+			Vector3 pos = transform.position;
+
 			//UNDONE: various scrolling style
 			switch (Policy)
 			{
 				case ScrollingType.Starring:
 					break;
 				case ScrollingType.BoxBinded:
+					// 水平方向
+					BoxBindedScrolling(ref pos);
+					break;
+				case ScrollingType.Smart:
+					if (_offsetXInLerping < 0f)
+					{
+						_offsetXInLerping = (_cam.ViewportToWorldPoint(new Vector3(0.5f + Left, 0, 0)) -
+						                     _cam.ViewportToWorldPoint(new Vector3(0.5f, 0, 0)))
+							.x;
+					}
+
+					if (_targetLastPosition != Target.position)
+					{
+						BoxBindedScrolling(ref pos);
+					}
+					else
+					{
+						bool targetIsFacingForward = Target.localScale.x >= 0;
+
+						Vector3 targetPos = Target.position;
+						targetPos.x += _offsetXInLerping * (targetIsFacingForward ? 1f : -1f);
+						targetPos.z = transform.position.z;
+						targetPos.y = transform.position.y;
+						transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime);
+					}
+
 					break;
 			}
 
-			// 根据目标在世界空间投射到屏幕后的位置来决定是否需要卷屏
-			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position);
-			Vector3 pos = transform.position;
+			_targetLastPosition = Target.position;
 
-			// 水平方向
+		}
+
+		/// <summary>
+		/// 几种不同的卷屏策略
+		/// 1. starring	位置锁定
+		/// 2. boxBinded	设定屏幕空间的一个rect，如果角色位置要移出则跟随位置，并保持偏移量
+		/// 3. boxBindedMirror	同2， 但目标换向的时候相机tween到与角色朝向(x axis)相反的方向
+		/// 4. ...
+		/// </summary>
+		public enum ScrollingType
+		{
+			Starring = 0,
+			BoxBinded = 1,
+			BoxBindedMirrow = 2,		// TBD
+			Smart = 3,
+		}
+
+		void BoxBindedScrolling(ref Vector3 pos)
+		{
 			if (IsOutOfBoundHorizon())
 			{
 				// 给水平offset赋初始值
@@ -93,7 +144,7 @@ namespace qbfox
 			}
 
 			// 垂直方向
-			if (IsOutOfBoundVertical())
+			if (IsOutOfBoundVertical() && HorizontalOnly)
 			{
 				// 垂直offset初始赋值
 				if (float.IsNaN(_offsetY))
@@ -110,25 +161,8 @@ namespace qbfox
 
 			// lock住深度偏移量
 			pos.z = Target.position.z - _offsetZ;
-
-			_targetLastPosition = Target.position;
-
 			transform.position = pos;
-		}
 
-		/// <summary>
-		/// 几种不同的卷屏策略
-		/// 1. starring	位置锁定
-		/// 2. boxBinded	设定屏幕空间的一个rect，如果角色位置要移出则跟随位置，并保持偏移量
-		/// 3. boxBindedMirror	同2， 但目标换向的时候相机tween到与角色朝向(x axis)相反的方向
-		/// 4. ...
-		/// </summary>
-		public enum ScrollingType
-		{
-			Starring = 0,
-			BoxBinded = 1,
-			BoxBindedMirrow = 2,
-			TBD = 3,
 		}
 
 		void OnGUI()
