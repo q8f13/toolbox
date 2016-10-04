@@ -22,4 +22,18 @@ public class qfUtility {
 
 		return result;
 	}
+
+	public static T CreateInstance<T>(GameObject prefab, Transform parent = null) where T : Component
+	{
+		T instance = null;
+
+		GameObject go = GameObject.Instantiate(prefab);
+		go.transform.parent = parent;
+		go.transform.localPosition = Vector3.zero;
+		go.transform.localScale = Vector3.one;
+		go.transform.localRotation = Quaternion.identity;
+		instance = go.GetComponent<T>();
+
+		return instance;
+	}
 }
