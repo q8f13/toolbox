@@ -28,6 +28,8 @@ public class qfBetterInput : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		Camera.main.orthographic = true;
+		Camera.main.clearFlags = CameraClearFlags.SolidColor;
 		_length = Camera.main.orthographicSize;
 	}
 	
@@ -105,7 +107,7 @@ public class qfBetterInput : MonoBehaviour
 	void OnGUI()
 	{
 		_currTimeScale = GUI.HorizontalSlider(new Rect(0, 20, 200, 30), _currTimeScale, 0.0f, 1.0f);
-		GUI.Label(new Rect(0, 60, 200, 30), _currTimeScale.ToString("f1") );
+		GUI.Label(new Rect(0, 60, 200, 30), string.Format("TimeScale : {0}", _currTimeScale.ToString("f1")));
 	}
 
 	void OnDrawGizmos()
