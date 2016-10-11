@@ -17,9 +17,9 @@ public class qfBetterInput : MonoBehaviour
 
 	private Vector3 _inputFiltered = Vector3.zero;
 
-	public Color RawColor = Color.red;
-	public Color DarkRawColor = Color.red;
-	public Color DeadZone = Color.magenta;
+	private Color _rawColor = Color.red;
+	private Color _darkRawColor = new Color(178f/255f, 0, 0);
+	private Color _deadZone = new Color(0, 75f/255f, 197f/255f);
 
 	private float _currTimeScale = 1.0f;
 	private float _length = -1f;
@@ -119,13 +119,13 @@ public class qfBetterInput : MonoBehaviour
 		scrCenter.z = 50f;
 		float length = _length;
 		// outframe
-		Gizmos.color = RawColor;
+		Gizmos.color = _rawColor;
 		Gizmos.DrawWireSphere(scrCenter, length );
-		Gizmos.color = DarkRawColor;
+		Gizmos.color = _darkRawColor;
 		Gizmos.DrawWireCube(scrCenter, Vector3.one * length * 2 );
 		// deadzone
 		scrCenter.z = 80f;
-		Gizmos.color = DeadZone;
+		Gizmos.color = _deadZone;
 		Gizmos.DrawWireSphere(scrCenter, length * RadialDeadZoneThreshold);
 		Gizmos.DrawWireSphere(scrCenter, length * InnerDeadZoneThreshold);
 
