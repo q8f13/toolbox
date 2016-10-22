@@ -102,7 +102,6 @@ namespace qbfox
 						&& IsOutOfBoundHorizon())
 					{
 						BoxBindedScrolling(ref pos);
-						Debug.Log("boxbind");
 					}
 					else
 					{
@@ -113,7 +112,6 @@ namespace qbfox
 						targetPos.z = transform.position.z;
 						targetPos.y = transform.position.y;
 						transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime);
-						Debug.Log("lerp");
 					}
 
 					break;
