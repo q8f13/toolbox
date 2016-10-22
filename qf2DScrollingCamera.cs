@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// 2d scrolling camera
@@ -21,6 +22,10 @@ namespace qbfox
 
 		// scrolling style
 		public ScrollingType Policy = ScrollingType.Starring;
+
+		// boundarys
+		public BoxCollider2D LeftBorder;
+		public BoxCollider2D RightBorder;
 
 		// target bound in screen
 		private Vector3 _targetSize;
@@ -49,6 +54,8 @@ namespace qbfox
 
 		private float _offsetXInLerping = -1f;
 
+		private Vector2 _camHalfSizeInWorld;
+
 		public void SetTarget(Transform target)
 		{
 			// lock z offset from cam to target
@@ -64,11 +71,15 @@ namespace qbfox
 
 			_debugOn = true;
 
+			_camHalfSizeInWorld.x = _cam.ViewportToWorldPoint(new Vector3(0.5f, 0, 0)).x - _cam.ViewportToWorldPoint(Vector3.zero).x;
+			_camHalfSizeInWorld.y = _cam.ViewportToWorldPoint(new Vector3(0, 0.5f, 0)).y - _cam.ViewportToWorldPoint(Vector3.zero).y;
+
 			if (Target == null)
 				return;
 
 			// lock z offset from cam to target
 			_offsetZ = Target.position.z - transform.position.z;
+
 		}
 
 		void Update()
@@ -115,6 +126,17 @@ namespace qbfox
 					}
 
 					break;
+			}
+
+			// boundary limit
+			if (LeftBorder && RightBorder)
+			{
+				Vector3 post_pos = transform.position;
+				post_pos.x = Mathf.Clamp(post_pos.x
+					, LeftBorder.transform.position.x + _camHalfSizeInWorld.x
+					, RightBorder.transform.position.x - _camHalfSizeInWorld.x);
+
+				transform.position = post_pos;
 			}
 
 			_targetLastPosition = Target.position;
