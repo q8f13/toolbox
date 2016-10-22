@@ -49,6 +49,15 @@ namespace qbfox
 
 		private float _offsetXInLerping = -1f;
 
+		public void SetTarget(Transform target)
+		{
+			// lock z offset from cam to target
+			Target = target;
+			_offsetZ = target.position.z - transform.position.z;
+
+			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position);
+		}
+
 		void Start()
 		{
 			_cam = GetComponent<Camera>();
@@ -89,9 +98,11 @@ namespace qbfox
 							.x;
 					}
 
-					if (_targetLastPosition != Target.position)
+					if (_targetLastPosition != Target.position
+						&& IsOutOfBoundHorizon())
 					{
 						BoxBindedScrolling(ref pos);
+						Debug.Log("boxbind");
 					}
 					else
 					{
@@ -102,6 +113,7 @@ namespace qbfox
 						targetPos.z = transform.position.z;
 						targetPos.y = transform.position.y;
 						transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime);
+						Debug.Log("lerp");
 					}
 
 					break;
