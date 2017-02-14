@@ -10,7 +10,11 @@ namespace qbfox
 	[ExecuteInEditMode]
 	public class qfParallexScrolling : MonoBehaviour
 	{
-		public float Multiply = 1.0f;
+	    public const int SCR_WIDTH = 1920;
+//	    public const int SCR_HEIGHT = 1080;
+
+//		public float BasicMovement = 10.0f;
+//		public float Multiply = 1.0f;
 		public ScrollingBackground[] Backgrounds;		// 所需滚动的背景
 		public Camera TargetCamera;						// 基于这个相机的移动来做卷屏
 
@@ -23,6 +27,7 @@ namespace qbfox
 		private Vector3 _camLastPos;					// 上一帧的相机位置，用来计算位移
 
 		private float _horizionOffsetToScreen = 0.0f;
+		private float _verticalOffsetToScreen = 0.0f;
 
 		private Vector3 _viewportToCameraOffset;
 
@@ -63,7 +68,10 @@ namespace qbfox
 			if (HorizontalOnly)
 				cam_delta_offset.y = 0f;
 
-			_horizionOffsetToScreen = cam_delta_offset.x/Screen.width;
+			_horizionOffsetToScreen = cam_delta_offset.x;
+            _verticalOffsetToScreen = cam_delta_offset.y;
+//			_horizionOffsetToScreen = cam_delta_offset.x/SCR_WIDTH;
+//			_horizionOffsetToScreen = cam_delta_offset.x/Screen.width;
 
 			// 相机保持相对位置
 			Vector3 nextPos = camPos_xy + _viewportToCameraOffset;
@@ -73,17 +81,23 @@ namespace qbfox
 			for (int i = 0; i < Backgrounds.Length; i++)
 			{
 				currBg = Backgrounds[i];
-				float uvSpeed = _horizionOffsetToScreen * currBg.SpeedRate * Multiply;
+				float mvspeed_x = _horizionOffsetToScreen * currBg.SpeedRate;
+				float mvspeed_y = _verticalOffsetToScreen * currBg.SpeedRate;
+//				float uvSpeed = _horizionOffsetToScreen * currBg.SpeedRate * Multiply;
+//			    float nmSpeed = currBg.SpeedRate*Multiply;
 				Material mat = currBg.Container.GetComponent<MeshRenderer>().sharedMaterial;
+			    float uvSpeed = mvspeed_x/currBg.Container.localScale.x;
+                
 				if (currBg.IsUVLooping
 				 && BondAssetOutOfViewport(currBg.Container, currBg.AssetBond))
 				{
 					if (mat)
 					{
 						Vector2 offset = mat.GetTextureOffset("_MainTex");
-						offset.x -= uvSpeed;
+					    offset.x -= uvSpeed;
 						mat.SetTextureOffset("_MainTex", offset);
 					}
+
 				}
 				else
 				{
@@ -102,7 +116,9 @@ namespace qbfox
 	//					float width = Screen.width;
 	//					Backgrounds[i].Container.Translate(cam_delta_offset*Backgrounds[i].SpeedRate, Space.Self);
 	//					Backgrounds[i].Container.Translate(new Vector3(uvSpeed * width * 202.7f / Backgrounds[i].Container.localScale.x, 0, 0), Space.Self);
-						currBg.Container.Translate(new Vector3(uvSpeed * width, 0, 0), Space.Self);
+//						currBg.Container.Translate(new Vector3(nmSpeed * BasicMovement, 0, 0), Space.Self);
+						currBg.Container.Translate(new Vector3(mvspeed_x, mvspeed_y, 0), Space.Self);
+//						currBg.Container.Translate(new Vector3(uvSpeed * width, 0, 0), Space.Self);
 					}
 				}
 			}
@@ -169,6 +185,20 @@ namespace qbfox
 				Backgrounds[i].IsUVLooping = false;
 			}
 		}
+
+	    [ContextMenu("resize localscale according to image size")]
+	    void ResizeLocalScaleForImageSize()
+	    {
+	        for (int i = 0; i < Backgrounds.Length; i++)
+	        {
+	            Transform t = Backgrounds[i].Container;
+	            Material mat = t.GetComponent<MeshRenderer>().sharedMaterial;
+	            Texture2D tex = mat.mainTexture as Texture2D;
+	            float w = tex.width;
+	            float h = tex.height;
+                t.localScale = new Vector3(w / 100, h / 100, 1);
+	        }
+	    }
 		#endregion
 	}
 

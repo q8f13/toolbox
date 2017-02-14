@@ -53,8 +53,15 @@ namespace qbfox
 		private Vector3 _targetLastPosition;
 
 		private float _offsetXInLerping = -1f;
+		private float _offsetYInLerping = -1f;
 
 		private Vector2 _camHalfSizeInWorld;
+
+	    private Vector3 _lastVel;
+        public Vector3 LastVel { get { return _lastVel; } }
+	    private Vector3 _lastPos;
+
+	    private Bounds _charBound;
 
 		public void SetTarget(Transform target)
 		{
@@ -87,9 +94,15 @@ namespace qbfox
 			if (Target == null)
 				return;
 
+		    if (_charBound == default(Bounds))
+		        _charBound = Target.GetComponent<BoxCollider2D>().bounds;
 
 			// 根据目标在世界空间投射到屏幕后的位置来决定是否需要卷屏
-			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position);
+		    Vector3 foo = Target.position + new Vector3(0, _charBound.size.y/2f, 0);
+			_targetInViewportPoint = _cam.WorldToViewportPoint(foo);
+            Debug.DrawRay(foo, Vector3.up, Color.red);
+//			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position + _charBound.center);
+//			_targetInViewportPoint = _cam.WorldToViewportPoint(Target.position);
 			Vector3 pos = transform.position;
 
 			//UNDONE: various scrolling style
@@ -107,23 +120,28 @@ namespace qbfox
 						_offsetXInLerping = (_cam.ViewportToWorldPoint(new Vector3(0.5f + Left, 0, 0)) -
 						                     _cam.ViewportToWorldPoint(new Vector3(0.5f, 0, 0)))
 							.x;
+
+					    _offsetYInLerping = (_cam.ViewportToWorldPoint(new Vector3(0, 0.5f, 0)))
+                            .y;
 					}
 
-					if (_targetLastPosition != Target.position
-						&& IsOutOfBoundHorizon())
+					if (_targetLastPosition != Target.position)
 					{
-						BoxBindedScrolling(ref pos);
+						BoxBindedScrolling(ref pos, true);
 					}
-					else
-					{
+//					else
+//					{
 						bool targetIsFacingForward = Target.localScale.x >= 0;
+                        Vector3 targetPos = Target.position;
 
-						Vector3 targetPos = Target.position;
 						targetPos.x += _offsetXInLerping * (targetIsFacingForward ? 1f : -1f);
 						targetPos.z = transform.position.z;
-						targetPos.y = transform.position.y;
+                        if(HorizontalOnly)
+    						targetPos.y = transform.position.y;
+                        else
+                            targetPos.y += _offsetYInLerping;
 						transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime);
-					}
+//					}
 
 					break;
 			}
@@ -141,6 +159,10 @@ namespace qbfox
 
 			_targetLastPosition = Target.position;
 
+		    if (_lastPos != Vector3.zero)
+		        _lastVel = transform.position - _lastPos;
+
+		    _lastPos = transform.position;
 		}
 
 		/// <summary>
@@ -158,7 +180,7 @@ namespace qbfox
 			Smart = 3,
 		}
 
-		void BoxBindedScrolling(ref Vector3 pos)
+		void BoxBindedScrolling(ref Vector3 pos, bool ignoreVertical = false)
 		{
 			if (IsOutOfBoundHorizon())
 			{
@@ -176,7 +198,7 @@ namespace qbfox
 			}
 
 			// 垂直方向
-			if (IsOutOfBoundVertical() && HorizontalOnly)
+			if (IsOutOfBoundVertical() && !HorizontalOnly && !ignoreVertical)
 			{
 				// 垂直offset初始赋值
 				if (float.IsNaN(_offsetY))
@@ -194,7 +216,6 @@ namespace qbfox
 			// lock住深度偏移量
 			pos.z = Target.position.z - _offsetZ;
 			transform.position = pos;
-
 		}
 
 		void OnGUI()
@@ -239,6 +260,11 @@ namespace qbfox
 
 		}
 
+        bool IsOutOfBoundEither()
+        {
+            return IsOutOfBoundHorizon() || IsOutOfBoundVertical();
+        }
+
 		// 判断水平方向出界
 		bool IsOutOfBoundHorizon()
 		{
@@ -256,7 +282,12 @@ namespace qbfox
 		// 判断垂直方向出界
 		bool IsOutOfBoundVertical()
 		{
-			if (_targetInViewportPoint.y > 0.5f + Top || _targetInViewportPoint.y < 0.5f - Bottom)
+			if (_targetInViewportPoint.y > 0.5f + Top
+                && Target.position.y > _targetLastPosition.y)
+                return true;
+
+            if(_targetInViewportPoint.y < 0.5f - Bottom
+                && Target.position.y < _targetLastPosition.y)
 				return true;
 
 			return false;
