@@ -3,8 +3,9 @@ using System.Collections;
 
 public class qfCameraShake : MonoBehaviour
 {
-	public float Magnitude = 1.0f;
-	public IEnumerator Shake(float duration = 0.2f)
+	public float MagnitudeX = 1.0f;
+	public float MagnitudeY = 1.0f;
+	IEnumerator Shake_Co(float duration)
 	{
 		float elapsed = 0.0f;
 
@@ -12,18 +13,17 @@ public class qfCameraShake : MonoBehaviour
 
 		while (elapsed < duration)
 		{
-
 			elapsed += Time.deltaTime;
 
 			float percentComplete = elapsed / duration;
 			float damper = 1.0f - Mathf.Clamp(4.0f * percentComplete - 3.0f, 0.0f, 1.0f);
 
 			// map value to [-1, 1]
-			float x = Random.value * 2.0f - 1.0f;
+			float x = Random.value*2.0f - 1.0f;
 			float y = Random.value * 2.0f - 1.0f;
 //			float z = Random.value * 2.0f - 1.0f;
-			x *= Magnitude * damper;
-			y *= Magnitude * damper;
+			x *= MagnitudeX * damper;
+			y *= MagnitudeY * damper;
 //			z *= Magnitude * damper;
 
 //			transform.position = new Vector3(x, y, originalCamPos.z);
@@ -34,5 +34,10 @@ public class qfCameraShake : MonoBehaviour
 		}
 
 		transform.position = originalCamPos;
+	}
+
+	public void Shake(float duration)
+	{
+		StartCoroutine(Shake_Co(duration));
 	}
 }
