@@ -9,6 +9,7 @@ using System.Collections;
 public class qfHitEffect : MonoBehaviour
 {
 	public static string ON_HIT_KEY = "onHit";
+	public static string ON_DEFEND_KEY = "onDefendBlock";
 
 	public bool DebugOn = false;
 
@@ -19,11 +20,29 @@ public class qfHitEffect : MonoBehaviour
 
 	public void OnHit(Collider2D col, Vector3 pos)
 	{
-		transform.position = pos;
-		_size = col.bounds.size;
+		UpdateBound(col, pos);
+		Debug.DrawLine(pos, col.transform.parent.position, Color.yellow, 5.0f);
 		_animator.Play(ON_HIT_KEY, 0, 0f);
 
+		// 击中位置到攻击者重心划线，作为旋转角度。攻击者重心为原点
+		if (pos.y < col.bounds.center.y)
+			transform.localRotation = Quaternion.Euler(0, 0, 45);
+		else
+			transform.localRotation = Quaternion.Euler(0, 0, -45);
+
 		_hitPause.ShowHitPause();
+	}
+
+	public void OnDefend(Collider2D col, Vector3 pos)
+	{
+		UpdateBound(col, pos);
+		_animator.Play(ON_DEFEND_KEY, 0, 0f);
+	}
+
+	void UpdateBound(Collider2D col, Vector3 pos)
+	{
+		transform.position = pos;
+		_size = col.bounds.size;
 	}
 
 	void Start()
@@ -44,3 +63,4 @@ public class qfHitEffect : MonoBehaviour
 		}
 	}
 }
+
