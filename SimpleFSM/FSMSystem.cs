@@ -123,7 +123,7 @@ namespace qbfox
 		}
 		public virtual void Run(){}
 
-		public void TryChangeState(bool needAsync)
+		public void TryChangeState(bool needAsync = false)
 		{
 			if (m_Controller.IsChanging)
 			{
