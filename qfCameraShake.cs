@@ -5,11 +5,15 @@ public class qfCameraShake : MonoBehaviour
 {
 	public float MagnitudeX = 1.0f;
 	public float MagnitudeY = 1.0f;
+
+	private Vector3 _originCamPos;
+
 	IEnumerator Shake_Co(float duration)
 	{
 		float elapsed = 0.0f;
 
-		Vector3 originalCamPos = transform.position;
+		if(_originCamPos == default(Vector3))
+			_originCamPos = transform.position;
 
 		while (elapsed < duration)
 		{
@@ -27,13 +31,13 @@ public class qfCameraShake : MonoBehaviour
 //			z *= Magnitude * damper;
 
 //			transform.position = new Vector3(x, y, originalCamPos.z);
-			transform.position = originalCamPos + new Vector3(x, y,0);
+			transform.position = _originCamPos + new Vector3(x, y,0);
 //			transform.position = new Vector3(x, y, z);
 
 			yield return null;
 		}
 
-		transform.position = originalCamPos;
+		transform.position = _originCamPos;
 	}
 
 	public void Shake(float duration)
