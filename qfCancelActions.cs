@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if SEALED
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
@@ -136,3 +137,4 @@ public class CancelAnimation
 		return false;
 	}
 }
+#endif

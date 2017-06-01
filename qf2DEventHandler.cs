@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if SEALED
+using UnityEngine;
 using System.Collections;
 
 /// <summary>
@@ -34,3 +35,4 @@ public class qf2DEventHandler : MonoBehaviour, IqfEventTriggerHandler
 		return false;
 	}
 }
+#endif
