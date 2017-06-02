@@ -36,4 +36,28 @@ public class qfUtility {
 
 		return instance;
 	}
+
+	public static int Solution2Equation(double a, double b, double c, double[] solution)
+	{
+		double delt = b * b - 4 * a * c;
+		if (delt >= 0)
+		{
+			if (a > 1e-10)
+			{
+				solution[0] = (-b + System.Math.Sqrt(delt)) / (2 * a);
+				solution[1] = (-b - System.Math.Sqrt(delt)) / (2 * a);
+
+			}
+			else
+			{
+				solution[0] = (2 * c) / (-b + System.Math.Sqrt(delt));
+				solution[1] = (2 * c) / (-b - System.Math.Sqrt(delt));
+			}
+			return 2;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 }
