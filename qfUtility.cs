@@ -78,7 +78,7 @@ public class qfUtility {
 	/// <param name="shooterPosW">射击口当前世界空间坐标</param>
 	/// <param name="targetDirection">目标即使朝向</param>
 	/// <returns></returns>
-	public static Vector3 GetPredictAimingTiming(float targetSpeed
+	public static Vector3 GetPredictAimingPosition(float targetSpeed
 												, float bulletSpeed
 												, Vector3 targetPosW
 												, Vector3 shooterPosW
