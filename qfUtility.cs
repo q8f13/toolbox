@@ -130,4 +130,47 @@ public class qfUtility {
 
 		return targetPosW + targetDirection*targetSpeed*t;
 	}
+
+	/// <summary>
+	/// 让scrollView的content自动适应尺寸
+	/// </summary>
+	/// <param name="contentRt"></param>
+	/// <param name="gap"></param>
+	/// <param name="isVertical"></param>
+	/// <returns></returns>
+	public static float AutoAdjustForScrollView(RectTransform contentRt, float gap = 0.0f, bool isVertical = true)
+	{
+		// boundary issues
+		if (contentRt.childCount == 0)
+			return 0.0f;
+
+		float result = 0.0f;
+
+		// accumulate direct childs height
+		RectTransform rtChild = null;
+		int directChildCount = 0;
+		for (int i = 0; i < contentRt.childCount; i++)
+		{
+			if(contentRt.GetChild(i).parent == contentRt.transform)
+			{
+				rtChild = contentRt.GetChild(0).GetComponent<RectTransform>();
+				result += isVertical ? rtChild.sizeDelta.y : rtChild.sizeDelta.x;
+				directChildCount++;
+			}
+		}
+
+		// get gaps
+		if(gap > 0.0f)
+			result += gap*(directChildCount - 1);
+
+		Vector2 sd = contentRt.sizeDelta;
+		if(isVertical)
+			sd.y = result;
+		else
+			sd.x = result;
+
+		contentRt.sizeDelta = sd;
+
+		return result;
+	}
 }
