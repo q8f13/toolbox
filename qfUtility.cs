@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.EnterpriseServices;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// static utility functions
@@ -129,5 +133,45 @@ public class qfUtility {
 		Debug.Assert(t >= 0.0f, "t should above 0");
 
 		return targetPosW + targetDirection*targetSpeed*t;
+	}
+
+	public class DelayCallbackManager
+	{
+		private readonly MonoBehaviour _base;
+		private HashSet<int> _cache;
+
+		public bool Verbose = false;
+
+		public DelayCallbackManager(MonoBehaviour target)
+		{
+			_base = target;
+			_cache = new HashSet<int>();
+		}
+
+		public void DelayCall(UnityAction action, float delayInSec)
+		{
+			int hashCode = action.GetHashCode();
+			if (_cache.Contains(hashCode))
+			{
+				Debug.LogError(string.Format("delay call {0} already running", hashCode));
+				return;
+			}
+				
+			_base.StartCoroutine(DelayCall_Co(action, delayInSec));
+			_cache.Add(hashCode);
+
+			if(Verbose)
+				Debug.Log(string.Format("delay call {0} started in {1} secs", hashCode, delayInSec));
+		}
+
+		IEnumerator DelayCall_Co(UnityAction action, float delayInSec)
+		{
+			yield return new WaitForSeconds(delayInSec);
+			action();
+			int hashCode = action.GetHashCode();
+			_cache.Remove(hashCode);
+			if(Verbose)
+				Debug.Log(string.Format("delay call {0} cleared", hashCode));
+		}
 	}
 }
