@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using UnityEditor;
 
 /// <summary>
@@ -46,6 +47,11 @@ public class BacktraceReference : EditorWindow
 					FindObjectsReferencing(c);
 				}
 			}
+		}
+		else if(GUILayout.Button("Find ref from UIEventTriggers"))
+		{
+			// stub
+			FindReferenceFromEventTrigger(Selection.activeGameObject);
 		}
 	}
 
@@ -95,5 +101,40 @@ public class BacktraceReference : EditorWindow
 			}
 		}
 		return false;
+	}
+
+	private static void FindReferenceFromEventTrigger(GameObject target)
+	{
+		UIEventTrigger[] triggers = FindObjectsOfType<UIEventTrigger>();
+
+		foreach (UIEventTrigger trigger in triggers)
+		{
+			CheckDelegates(trigger, trigger.onClick, target, "onClick");
+			CheckDelegates(trigger, trigger.onHoverOut, target, "onHoverOut");
+			CheckDelegates(trigger, trigger.onPress, target, "onPress");
+			CheckDelegates(trigger, trigger.onRelease, target, "onRelease");
+			CheckDelegates(trigger, trigger.onHoverOver, target, "onHoverOver");
+		}
+
+		UIButton[] buttons = FindObjectsOfType<UIButton>();
+		foreach (UIButton btn in buttons)
+		{
+			CheckDelegates(btn, btn.onClick, target, "onClick");
+		}
+	}
+
+	private static void CheckDelegates(MonoBehaviour trigger, IEnumerable<EventDelegate> list, GameObject target, string delegateName)
+	{
+		foreach (EventDelegate d in list)
+		{
+			if(d == null || d.target == null)
+				continue;
+			if (d.target.gameObject == target)
+				Debug.Log(string.Format("Ref: Component {0}.{1} -> {2}.{3}"
+					, trigger.gameObject.name
+					, delegateName
+					, d.target.GetType()
+					, d.methodName));
+		}
 	}
 }
