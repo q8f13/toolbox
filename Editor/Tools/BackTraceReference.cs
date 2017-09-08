@@ -121,6 +121,12 @@ public class BacktraceReference : EditorWindow
 		{
 			CheckDelegates(btn, btn.onClick, target, "onClick");
 		}
+
+		UIToggle[] toggles = FindObjectsOfType<UIToggle>();
+		foreach (UIToggle t in toggles)
+		{
+			CheckDelegates(t, t.onChange, target, "onToggleChange");
+		}
 	}
 
 	private static void CheckDelegates(MonoBehaviour trigger, IEnumerable<EventDelegate> list, GameObject target, string delegateName)
