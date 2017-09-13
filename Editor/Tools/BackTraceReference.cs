@@ -70,6 +70,19 @@ public class BacktraceReference : EditorWindow
 				{
 					Debug.Log("Ref: Component " + obj.GetType() + " from Object " + obj.name + " references source component " + mb.GetType(), obj.gameObject);
 				}
+
+				if (fieldInfo.FieldType == typeof (Transform)
+				    || fieldInfo.FieldType == typeof (GameObject))
+				{
+					object o = fieldInfo.GetValue(obj);
+					if(o == null)
+						continue;
+					if (fieldInfo.GetValue(obj).Equals(mb.gameObject)
+					    || fieldInfo.GetValue(obj).Equals(mb.transform))
+						Debug.Log(
+							"Ref: Component " + obj.GetType() + " from Object " + obj.name + " references source component " + mb.GetType(),
+							obj.gameObject);
+				}
 			}
 		}
 	}
