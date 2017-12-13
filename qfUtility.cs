@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 /// <summary>
 /// static utility functions
+/// author: q8f13
+/// repo: https://github.com/q8f13/toolbox
 /// </summary>
 
 public class qfUtility {
