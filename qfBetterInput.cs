@@ -75,9 +75,9 @@ public class qfBetterInput : MonoBehaviour
 		}
 		else if (inMiddleArea)
 		{
-			int x_dir, y_dir = 0;
-			x_dir = _inputFiltered.x > 0 ? 1 : -1;
-			y_dir = _inputFiltered.y > 0 ? 1 : -1;
+//			int x_dir, y_dir = 0;
+//			x_dir = _inputFiltered.x > 0 ? 1 : -1;
+//			y_dir = _inputFiltered.y > 0 ? 1 : -1;
 			output.x = _inputFiltered.x * (len - InnerDeadZoneThreshold)/(RadialDeadZoneThreshold - InnerDeadZoneThreshold) * RadialDeadZoneThreshold;
 			output.y = _inputFiltered.y * (len - InnerDeadZoneThreshold)/(RadialDeadZoneThreshold - InnerDeadZoneThreshold) * RadialDeadZoneThreshold;
 //			output.x = rawData.x * (1.0f - (RadialDeadZoneThreshold - len)/(RadialDeadZoneThreshold - InnerDeadZoneThreshold)) * RadialDeadZoneThreshold;
@@ -112,7 +112,7 @@ public class qfBetterInput : MonoBehaviour
 
 	void OnDrawGizmos()
 	{
-		float scaleFromCamSize = 0.8f;
+//		float scaleFromCamSize = 0.8f;
 //		GUI.Box(new Rect(), )
 //		GUI.Box(new Rect(-Screen.width/2, -Screen.height/2, ScalarValue, ScalarValue), "");
 		Vector3 scrCenter = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));

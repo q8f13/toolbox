@@ -1,4 +1,5 @@
-﻿using EasyMotion2D;
+﻿#if SEALED
+using EasyMotion2D;
 using UnityEngine;
 using System.Collections;
 
@@ -67,3 +68,4 @@ public class qfEM2DToAnimator : StateMachineBehaviour
 
 
 }
+#endif
