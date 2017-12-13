@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if SEALED
+using UnityEngine;
 using System.Collections;
 
 /// <summary>
@@ -64,3 +65,4 @@ public class qfHitEffect : MonoBehaviour
 	}
 }
 
+#endif

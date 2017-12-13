@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if SEALED
+using UnityEngine;
 using System.Collections;
 
 /// <summary>
@@ -134,3 +135,4 @@ public interface IqfEventTriggerHandler
 	bool TriggerActivate(Collider2D collider, qf2DEventTrigger.TriggerType type);
 	bool TriggerActivate(Collider collider, qf2DEventTrigger.TriggerType type);
 }
+#endif
