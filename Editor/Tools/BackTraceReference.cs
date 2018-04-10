@@ -51,7 +51,8 @@ public class BacktraceReference : EditorWindow
 		else if(GUILayout.Button("Find ref from UIEventTriggers"))
 		{
 			// stub
-			FindReferenceFromEventTrigger(Selection.activeGameObject);
+//			FindReferenceFromEventTrigger(Selection.activeGameObject);
+			throw new NotImplementedException("Need NGUI UIEventTrigger class");
 		}
 	}
 
@@ -116,6 +117,11 @@ public class BacktraceReference : EditorWindow
 		return false;
 	}
 
+/*
+	====================
+	It's only available with NGUI UIEventTrigger class
+	====================
+
 	private static void FindReferenceFromEventTrigger(GameObject target)
 	{
 		UIEventTrigger[] triggers = FindObjectsOfType<UIEventTrigger>();
@@ -156,4 +162,5 @@ public class BacktraceReference : EditorWindow
 					, d.methodName));
 		}
 	}
+*/
 }
