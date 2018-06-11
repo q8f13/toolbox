@@ -13,6 +13,7 @@ public class BacktraceReference : EditorWindow
 	private Component _theObject;
 	bool specificComponent = false;
 
+
 	[MenuItem("GameObject/What Objects Reference this?")]
 	public static void Init()
 	{
@@ -51,6 +52,7 @@ public class BacktraceReference : EditorWindow
 		{
 			// stub
 //			FindReferenceFromEventTrigger(Selection.activeGameObject);
+			throw new NotImplementedException("Need NGUI UIEventTrigger class");
 		}
 	}
 
@@ -116,6 +118,10 @@ public class BacktraceReference : EditorWindow
 	}
 
 /*
+	====================
+	It's only available with NGUI UIEventTrigger class
+	====================
+
 	private static void FindReferenceFromEventTrigger(GameObject target)
 	{
 		UIEventTrigger[] triggers = FindObjectsOfType<UIEventTrigger>();
@@ -141,9 +147,7 @@ public class BacktraceReference : EditorWindow
 			CheckDelegates(t, t.onChange, target, "onToggleChange");
 		}
 	}
-*/
 
-/*
 	private static void CheckDelegates(MonoBehaviour trigger, IEnumerable<EventDelegate> list, GameObject target, string delegateName)
 	{
 		foreach (EventDelegate d in list)

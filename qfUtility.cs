@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 /// <summary>
 /// static utility functions
+/// author: q8f13
+/// repo: https://github.com/q8f13/toolbox
 /// </summary>
 
 public class qfUtility {
@@ -38,6 +40,27 @@ public class qfUtility {
 		instance = go.GetComponent<T>();
 
 		return instance;
+	}
+
+	public static void DrawLineArrow(Vector3 from, Vector3 to, int count = 1)
+	{
+		float distanceStep = (to - from).magnitude/(count + 1);
+		Vector3 dir = (to - from).normalized;
+		int idx = 1;
+		Gizmos.DrawLine(from, to);
+		int failsafe = 999;
+		while (idx <= count)
+		{
+			Vector3 p = from + dir*distanceStep*idx;
+			Gizmos.DrawRay(p, Quaternion.Euler(0,30,0) * -dir);
+			Gizmos.DrawRay(p, Quaternion.Euler(0,-30,0) * -dir);
+			idx++;
+			failsafe--;
+			if (failsafe < 0)
+			{
+				throw new System.Exception("failsafe");
+			}
+		}
 	}
 
 	/// <summary>
@@ -218,5 +241,31 @@ public class qfUtility {
 		contentRt.sizeDelta = sd;
 
 		return result;
+	}
+
+	/// <summary>
+	/// 将世界空间坐标转换到屏幕空间的时候，有可能因为物体与相机的朝向问题
+	/// 导致距离在超出一定范围后出现反转，x = -x, y = -y 类似这种的情况
+	/// 这个方法是先将物体位置与屏幕空间计算，保持将物体位置信息转算为在相机前方
+	/// 注意这个方法返回值仍然是世界空间坐标
+	/// </summary>
+	/// <param name="position">目标世界空间位置</param>
+	/// <param name="cam">所用相机</param>
+	/// <returns>转算后的目标世界空间位置</returns>
+	public static Vector3 CalculateWorldPositionAsCamera(Vector3 position, Camera cam)
+	{
+		//if the point is behind the camera then project it onto the camera plane
+		Vector3 camNormal = cam.transform.forward;
+		Vector3 vectorFromCam = position - cam.transform.position;
+		float camNormDot = Vector3.Dot(camNormal, vectorFromCam.normalized);
+		if (camNormDot <= 0f)
+		{
+			//we are beind the camera, project the position on the camera plane
+			float camDot = Vector3.Dot(camNormal, vectorFromCam);
+			Vector3 proj = (camNormal * camDot * 1.01f);   //small epsilon to keep the position infront of the camera
+			position = cam.transform.position + (vectorFromCam - proj);
+		}
+
+		return position;
 	}
 }
