@@ -13,7 +13,6 @@ public class BacktraceReference : EditorWindow
 	private Component _theObject;
 	bool specificComponent = false;
 
-
 	[MenuItem("GameObject/What Objects Reference this?")]
 	public static void Init()
 	{
@@ -51,7 +50,7 @@ public class BacktraceReference : EditorWindow
 		else if(GUILayout.Button("Find ref from UIEventTriggers"))
 		{
 			// stub
-			FindReferenceFromEventTrigger(Selection.activeGameObject);
+//			FindReferenceFromEventTrigger(Selection.activeGameObject);
 		}
 	}
 
@@ -116,6 +115,7 @@ public class BacktraceReference : EditorWindow
 		return false;
 	}
 
+/*
 	private static void FindReferenceFromEventTrigger(GameObject target)
 	{
 		UIEventTrigger[] triggers = FindObjectsOfType<UIEventTrigger>();
@@ -141,7 +141,9 @@ public class BacktraceReference : EditorWindow
 			CheckDelegates(t, t.onChange, target, "onToggleChange");
 		}
 	}
+*/
 
+/*
 	private static void CheckDelegates(MonoBehaviour trigger, IEnumerable<EventDelegate> list, GameObject target, string delegateName)
 	{
 		foreach (EventDelegate d in list)
@@ -156,4 +158,5 @@ public class BacktraceReference : EditorWindow
 					, d.methodName));
 		}
 	}
+*/
 }

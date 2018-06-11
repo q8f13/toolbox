@@ -14,7 +14,7 @@ public class qfUtility {
 	{
 		T result = null;
 	
-		Transform target = parent.FindChild(path);
+		Transform target = parent.Find(path);
 		if (target == null)
 		{
 			Debug.LogError(string.Format("cannot get child by path: {0}", path));
