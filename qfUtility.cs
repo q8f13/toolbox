@@ -268,4 +268,34 @@ public class qfUtility {
 
 		return position;
 	}
+
+	/// <summary>
+	/// x^2 / a^2 + y^2 / b^2 = 1
+	/// </summary>
+	/// <param name="isHorizon"></param>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <param name="value"></param>
+	/// <returns></returns>
+	public static float[] GetEllipseBound(bool forHorizon, float a, float b, float value, Vector2 offset)
+	{
+		float[] bound = new float[2];
+		// x^2 / a^2 + y^2 / b^2 = 1
+		// x^2 = (- y^2 / b^2 + 1) * a^2
+		if (forHorizon)
+		{
+			float x_square = (1 - (value*value)/(b*b))*(a*a);
+			bound[0] = -Mathf.Sqrt(x_square) + offset.x;
+			bound[1] = Mathf.Sqrt(x_square) + offset.x;
+		}
+		// y^2 = (- y^2 / a^2 + 1) * b^2
+		else
+		{
+			float y_square = (1 - (value*value)/(a*a))*(b*b);
+			bound[0] = -Mathf.Sqrt(y_square) + offset.y;
+			bound[1] = Mathf.Sqrt(y_square) + offset.y;
+		}
+
+		return bound;
+	}
 }
