@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 /// <summary>
 /// static utility functions
-/// author: q8f13
-/// repo: https://github.com/q8f13/toolbox
 /// </summary>
 
 public class qfUtility {
@@ -40,27 +35,6 @@ public class qfUtility {
 		instance = go.GetComponent<T>();
 
 		return instance;
-	}
-
-	public static void DrawLineArrow(Vector3 from, Vector3 to, int count = 1)
-	{
-		float distanceStep = (to - from).magnitude/(count + 1);
-		Vector3 dir = (to - from).normalized;
-		int idx = 1;
-		Gizmos.DrawLine(from, to);
-		int failsafe = 999;
-		while (idx <= count)
-		{
-			Vector3 p = from + dir*distanceStep*idx;
-			Gizmos.DrawRay(p, Quaternion.Euler(0,30,0) * -dir);
-			Gizmos.DrawRay(p, Quaternion.Euler(0,-30,0) * -dir);
-			idx++;
-			failsafe--;
-			if (failsafe < 0)
-			{
-				throw new System.Exception("failsafe");
-			}
-		}
 	}
 
 	/// <summary>
@@ -158,49 +132,6 @@ public class qfUtility {
 	}
 
 	/// <summary>
-	/// 小工具，延时调用方法的管理
-	/// </summary>
-	public class DelayCallbackManager
-	{
-		private readonly MonoBehaviour _base;
-		private HashSet<int> _cache;
-
-		public bool Verbose = false;
-
-		public DelayCallbackManager(MonoBehaviour target)
-		{
-			_base = target;
-			_cache = new HashSet<int>();
-		}
-
-		public void DelayCall(UnityAction action, float delayInSec)
-		{
-			int hashCode = action.GetHashCode();
-			if (_cache.Contains(hashCode))
-			{
-				Debug.LogError(string.Format("delay call {0} already running", hashCode));
-				return;
-			}
-
-			_base.StartCoroutine(DelayCall_Co(action, delayInSec));
-			_cache.Add(hashCode);
-
-			if (Verbose)
-				Debug.Log(string.Format("delay call {0} started in {1} secs", hashCode, delayInSec));
-		}
-
-		private IEnumerator DelayCall_Co(UnityAction action, float delayInSec)
-		{
-			yield return new WaitForSeconds(delayInSec);
-			action();
-			int hashCode = action.GetHashCode();
-			_cache.Remove(hashCode);
-			if (Verbose)
-				Debug.Log(string.Format("delay call {0} cleared", hashCode));
-		}
-	}
-
-	/// <summary>
 	/// 让scrollView的content自动适应尺寸
 	/// </summary>
 	/// <param name="contentRt"></param>
@@ -244,58 +175,38 @@ public class qfUtility {
 	}
 
 	/// <summary>
-	/// 将世界空间坐标转换到屏幕空间的时候，有可能因为物体与相机的朝向问题
-	/// 导致距离在超出一定范围后出现反转，x = -x, y = -y 类似这种的情况
-	/// 这个方法是先将物体位置与屏幕空间计算，保持将物体位置信息转算为在相机前方
-	/// 注意这个方法返回值仍然是世界空间坐标
+	/// 从0开始生成一串不重复的整型数字
+	/// 基于Fisher and Yates算法， Durstenfeld's version
+	/// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	/// </summary>
-	/// <param name="position">目标世界空间位置</param>
-	/// <param name="cam">所用相机</param>
-	/// <returns>转算后的目标世界空间位置</returns>
-	public static Vector3 CalculateWorldPositionAsCamera(Vector3 position, Camera cam)
-	{
-		//if the point is behind the camera then project it onto the camera plane
-		Vector3 camNormal = cam.transform.forward;
-		Vector3 vectorFromCam = position - cam.transform.position;
-		float camNormDot = Vector3.Dot(camNormal, vectorFromCam.normalized);
-		if (camNormDot <= 0f)
-		{
-			//we are beind the camera, project the position on the camera plane
-			float camDot = Vector3.Dot(camNormal, vectorFromCam);
-			Vector3 proj = (camNormal * camDot * 1.01f);   //small epsilon to keep the position infront of the camera
-			position = cam.transform.position + (vectorFromCam - proj);
-		}
-
-		return position;
-	}
-
-	/// <summary>
-	/// x^2 / a^2 + y^2 / b^2 = 1
-	/// </summary>
-	/// <param name="isHorizon"></param>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
-	/// <param name="value"></param>
+	/// <param name="count">要生成的数量</param>
 	/// <returns></returns>
-	public static float[] GetEllipseBound(bool forHorizon, float a, float b, float value, Vector2 offset)
+	public static int[] GetRandomUniqueIntegers(int count)
 	{
-		float[] bound = new float[2];
-		// x^2 / a^2 + y^2 / b^2 = 1
-		// x^2 = (- y^2 / b^2 + 1) * a^2
-		if (forHorizon)
+		Debug.Assert(count > 1, "count should above 1");
+
+		int[] arr = new int[count];
+		int c = count;
+		while (--c >= 0)
 		{
-			float x_square = (1 - (value*value)/(b*b))*(a*a);
-			bound[0] = -Mathf.Sqrt(x_square) + offset.x;
-			bound[1] = Mathf.Sqrt(x_square) + offset.x;
-		}
-		// y^2 = (- y^2 / a^2 + 1) * b^2
-		else
-		{
-			float y_square = (1 - (value*value)/(a*a))*(b*b);
-			bound[0] = -Mathf.Sqrt(y_square) + offset.y;
-			bound[1] = Mathf.Sqrt(y_square) + offset.y;
+			arr[c] = c;
 		}
 
-		return bound;
+		int n = count - 1;
+		while (n >= 0)
+		{
+			int rnd = UnityEngine.Random.Range(0, n);
+			if (rnd == n)
+			{
+				n--;
+				continue;
+			}
+			int swap = arr[n];
+			arr[n] = arr[rnd];
+			arr[rnd] = swap;
+			n--;
+		}
+
+		return arr;
 	}
 }
