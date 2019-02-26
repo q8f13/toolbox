@@ -209,4 +209,25 @@ public class qfUtility {
 
 		return arr;
 	}
+
+	/// <summary>
+	/// 四元数指数计算
+	/// 可用来算取百分比后的某个角位移的四元数是多少
+	/// </summary>
+	public static Quaternion QuaternionExp(Quaternion q, float exponent)
+	{
+		if(Mathf.Abs(q.w) < 0.9999f)
+		{
+			float alpha = Mathf.Acos(q.w);
+			float new_alpha = alpha * exponent;
+			float w = Mathf.Cos(new_alpha);
+			float multi = Mathf.Sin(new_alpha) / Mathf.Sin(alpha);
+
+			q.x*=multi;
+			q.y*=multi;
+			q.z*=multi;
+		}
+
+		return q;
+	}
 }
