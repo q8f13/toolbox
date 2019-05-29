@@ -25,7 +25,7 @@ public class CooldownManager : MonoBehaviour
 	{
 		foreach (KeyValuePair<string, CooldownItem> item in _cooldownPool)
 		{
-			item.Value.Dispose();
+			item.Value=null;
 			_cooldownPool.Clear();
 		}
 	}
@@ -84,7 +84,7 @@ public class CooldownManager : MonoBehaviour
 /// cooldown item data structure
 /// container for cooldown tracking
 /// </summary>
-public class CooldownItem :IDisposable
+public class CooldownItem
 {
 	public string Key;
 	public float Timer = 0.0f;
@@ -128,10 +128,5 @@ public class CooldownItem :IDisposable
 			if (Timer <= 0.0f && OnCooldownReadyTrigger != null)
 				OnCooldownReadyTrigger(Key);
 		}
-	}
-
-	public void Dispose()
-	{
-		OnCooldownReadyTrigger = null;
 	}
 }
