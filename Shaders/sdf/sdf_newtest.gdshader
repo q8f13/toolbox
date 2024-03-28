@@ -11,18 +11,22 @@ const float MIN_DIST = 0.0;
 const float EPSILON = 0.0001;
 
 uniform uint sample_times_through = 5;
-uniform float multiplier = 0.2;
+uniform float multiplier:hint_range(0.0, 1.0, 0.02) = 0.2;
 uniform float max_dist = 200.0;
 
 uniform bool remap_for_tint = false;
 
 uniform sampler2D color_tint_tex;
 
-uniform float uv_scale = 1.0;
-uniform vec2 uv_offset;
+uniform float size = 4.0;
+
+uniform vec3 uv_scale = vec3(1.0);
+uniform vec3 uv_offset = vec3(0.0);
 
 //uniform vec3 boundsMin;
 uniform sampler3D noiseTex3D;
+
+uniform float sampleThreshold:hint_range(0.0, 1.0, 0.02) = 0.1;
 
 uniform float sphere_r = 1.3;
 
@@ -68,9 +72,9 @@ float expo(float v){
 }
 
 vec4 sampleVolume(vec3 p){
-	vec3 uvw = p / max_dist + vec3(0.5);
-	uvw = uvw * uv_scale + vec3(uv_offset.x, 0.0, uv_offset.y);
-//	uvw = clamp(uvw, vec3(0.0), vec3(1.0));
+	vec3 uvw = (p / size + vec3(0.5)) * uv_scale + uv_offset;
+//	vec3 uvw = p / 128.0 + vec3(0.5);
+	uvw = clamp(uvw, vec3(0.0), vec3(1.0));
 	vec4 v = texture(noiseTex3D, uvw);
 	return v;
 }
@@ -115,7 +119,8 @@ float marchThrough(vec3 eye, vec3 marchingDirection, float start, float end, vec
 	float sample_through_step = (end - depth_begin) / float(sample_times_through);
 	for(int i=0;i<int(times);i++){
 		p = eye + marchingDirection * (depth_begin + sample_through_step * float(i));
-		float val = step(0.5,sampleVolume(p).r);
+		float sampled_val = sampleVolume(p).r;
+		float val = step(sampleThreshold,sampled_val);
 		accu += val * multiplier;
 //		accu += expo(val);
 	}
@@ -179,6 +184,6 @@ void fragment() {
 	ALBEDO.xyz = clr.xyz;
 //	ALBEDO.xyz = vec3(dot(rayDir, viewDir));
 	
-//	ALPHA = 1.0;
-	ALPHA = clr.a;
+	ALPHA = clamp(clr.a, 0.0, 1.0);
+//	ALPHA = 1.0 - clr.a;
 }
