@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://dshhonjard7s5"]
+
+[ext_resource type="Script" path="res://PIDTest/PIDTest.gd" id="1_4skdb"]
+[ext_resource type="Texture2D" uid="uid://dy58rycju3avl" path="res://icon.svg" id="1_lvgvr"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_w8w1e"]
+particle_flag_disable_z = true
+direction = Vector3(-1, 0, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 180.0
+initial_velocity_max = 180.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+
+[node name="PIDTest" type="Node2D" node_paths=PackedStringArray("unit")]
+script = ExtResource("1_4skdb")
+unit = NodePath("GPUParticles2D")
+target_y = -350.0
+speed = 10.0
+kp = 0.92
+ki = 0.14
+kd = -0.185
+use_pi = true
+use_pd = true
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+amount = 231
+process_material = SubResource("ParticleProcessMaterial_w8w1e")
+texture = ExtResource("1_lvgvr")
+lifetime = 5.0
+
+[node name="Camera2D" type="Camera2D" parent="."]
