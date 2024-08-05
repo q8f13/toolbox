@@ -230,4 +230,16 @@ public class qfUtility {
 
 		return q;
 	}
+
+	// number damper
+	// https://theorangeduck.com/page/spring-roll-call#damper
+	public static float DamperExponential(
+        float x,
+        float g, 
+        float damping, 
+        float dt, 
+        float ft = 1.0f / 60.0f)
+    {
+        return Mathf.Lerp(x, g, 1.0f - Mathf.Pow(1.0f / (1.0f - ft * damping), -dt / ft));
+    }
 }
