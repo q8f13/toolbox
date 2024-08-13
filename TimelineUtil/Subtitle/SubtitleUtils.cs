@@ -8,7 +8,7 @@ using System.Collections.Generic;
 // for creating TMP font characters
 // generated TextAsset path should be noticed
 
-namespace qfTimeline
+namespace qbfox.TimelineExtend
 {
 	public class SubtitleUtils
 	{
