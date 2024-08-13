@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
+// Send FSMEvent to bootloader
+
 public class FSMEventTriggerClip :PlayableAsset, ITimelineClipAsset
 {
 	public ClipCaps clipCaps
